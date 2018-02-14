@@ -101,5 +101,11 @@ def main():
     for item in d2vm.wv.most_similar(positive=['storm'], negative=['rain'], topn=4):
         print(item)
 
+    test_str = 'looks like another sunny day tomorrow'
+    print('\n\ntweets similar to "' +test_str+ '" are ...')
+    test_vec = d2vm.infer_vector(test_str.split())
+    for tweet in d2vm.docvecs.most_similar([test_vec], topn=3):
+        print(tweet)
+
 # start of main script 
 main()
