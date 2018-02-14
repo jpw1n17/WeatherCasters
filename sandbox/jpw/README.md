@@ -13,5 +13,8 @@ this is a folder to experiment with nltk
 1. virtualenv env
 1. source env/bin/activate
 1. pip install -r requirements.txt
+1. python
+	1. import nltk
+	1. nltk.download('stopwords')
 
 
