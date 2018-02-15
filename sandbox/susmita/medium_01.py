@@ -7,6 +7,7 @@ Created on Wed Feb 14 16:54:52 2018
 
 #Import all the dependencies
 import gensim
+import csv
 from nltk import RegexpTokenizer
 from nltk.corpus import stopwords
 from os import listdir
@@ -14,7 +15,7 @@ from os.path import isfile, join
 
 train_data = []
 
-with open('A:/sem2/data mining/group project/data/train.csv',encoding="utf8") as file:
+with open('../../data/train.csv',encoding="utf8") as file:
     # Read File
     reader = csv.reader(file)
     train_data = [row for row in reader]
