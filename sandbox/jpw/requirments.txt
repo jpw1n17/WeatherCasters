@@ -1,5 +1,6 @@
 nltk
 numpy
 gensim
+pandas
 
 

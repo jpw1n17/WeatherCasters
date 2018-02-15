@@ -1,30 +1,14 @@
-import csv
-from os import listdir
 from os import makedirs
-from os.path import isfile, isdir, exists, join
+from os.path import exists
+import pandas as pd
 
 from nltk import RegexpTokenizer
 from nltk.corpus import stopwords
-
 import gensim
 
 #global variables
 g_data_path = '../../data/'
 g_output_path = './gen_data/'
-
-def load_csv(file_path):
-    data_obj = {}
-    headers = []
-    with open(file_path, 'r', encoding='utf8') as csv_file:
-        reader = csv.reader(csv_file, delimiter=',')
-        headers = next(reader)
-        for col in headers:
-            data_obj[col] = []
-        for row in reader:
-            for col, val in zip(headers, row):
-                data_obj[col].append(val)
-    data_obj['headers'] = headers
-    return data_obj
 
 def nlp_clean(data):
     tokenizer = RegexpTokenizer(r'\w+')
@@ -45,10 +29,6 @@ def link_doc_to_id(docs, ids):
     for doc, id in zip(docs, ids):
         linked_docs.append(gensim.models.doc2vec.TaggedDocument(doc, [id]))
     return linked_docs
-
-def create_dir_if_not_exist(dir_path):
-    if not exists(dir_path):
-        makedirs(dir_path)
 
 def load_or_create_vector_space(docs, ids):
     if len(docs) != len(ids):
@@ -72,22 +52,16 @@ def load_or_create_vector_space(docs, ids):
         return d2v_model
 
 def main():
-    tweet_id_header_col_index = 0
-    tweet_header_col_index = 1
-    create_dir_if_not_exist(g_output_path)
+    makedirs(g_output_path, exist_ok=True)
 
     print('Loading source data')
-    source_data = load_csv(g_data_path + 'train.csv')
-    headers = source_data['headers']
-    tweet_header_label = headers[tweet_header_col_index]
-    tweet_id_header_label = headers[tweet_header_col_index]
-    tweet_ids = source_data[tweet_id_header_label]
-    raw_tweets = source_data[tweet_header_label]
+    #source_data = load_csv(g_data_path + 'train.csv')
+    source_data = pd.read_csv(g_data_path + 'train.csv')
 
     print('cleaning tweets')
-    clean_tweets = nlp_clean(raw_tweets)
-    
-    d2vm = load_or_create_vector_space(clean_tweets, tweet_ids)
+    clean_tweets = nlp_clean(source_data['tweet'])
+
+    d2vm = load_or_create_vector_space(clean_tweets, source_data['id'])
 
     print('vectors space trained, most similar too "strom" are...')
     for item in d2vm.wv.most_similar(positive=['storm'], topn=4):
