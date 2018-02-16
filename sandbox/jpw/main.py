@@ -3,11 +3,11 @@ from os.path import exists
 import pandas as pd
 import copy
 
-from nltk import RegexpTokenizer
-from nltk.corpus import stopwords
 import gensim
 import sklearn
 import matplotlib.pyplot as plt
+
+import preprocess
 
 #global variables
 g_data_path = '../../data/'
@@ -22,15 +22,7 @@ class AppState(object):
 
 def add_cleaned_tweets(state):
     print('cleaning tweets')
-    tokenizer = RegexpTokenizer(r'\w+')
-    stopword_set = set(stopwords.words('english'))
-    state.cleaned_tweets = []
-    for d in state.df.tweet:
-        new_str = d.lower()
-        ordered_list = tokenizer.tokenize(new_str)
-        clipped_list = list(set(ordered_list).difference(stopword_set)) # side effect of changing word order
-        clipped_ordered_list = [word for word in ordered_list if word in clipped_list]
-        state.cleaned_tweets.append(clipped_ordered_list)
+    state.cleaned_tweets = preprocess.process(state.df.tweet)
 
 def add_link_doc_to_id(state):
     state.lookup = {}
