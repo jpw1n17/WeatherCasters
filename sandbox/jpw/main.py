@@ -33,14 +33,10 @@ def add_cleaned_tweets(state):
         state.cleaned_tweets.append(clipped_ordered_list)
 
 def add_link_doc_to_id(state):
-    ids = state.df.id
-    raw_docs = state.df.tweet
-    docs = state.cleaned_tweets
-    
     state.lookup = {}
     state.lookup_raw = {}
     state.tagged_docs = []
-    for doc, raw, id in zip(docs, raw_docs, ids):
+    for doc, raw, id in zip(state.cleaned_tweets, state.df.tweet, state.df.id):
         state.lookup[id]=doc
         state.lookup_raw[id]=raw
         state.tagged_docs.append(gensim.models.doc2vec.TaggedDocument(doc, [id]))
@@ -53,10 +49,10 @@ def load_or_create_vector_space(state):
     else:
         # create from scratch
         print('Creating doc2vec model')
-        state.d2vm = gensim.models.Doc2Vec(min_count=0, alpha=0.025, min_alpha=0.025)
-        state.d2vm.build_vocab(tagged_docs)
+        state.d2vm = gensim.models.Doc2Vec(vector_size=state.vector_size, min_count=0, alpha=0.025, min_alpha=0.025)
+        state.d2vm.build_vocab(state.tagged_docs)
         print('    created vocab')
-        state.d2vm.train(data.bag['tagged_docs'], total_examples=len(data.bag['tagged_docs']), epochs=100)
+        state.d2vm.train(state.tagged_docs, total_examples=len(state.tagged_docs), epochs=100)
         print('    trained model')
         state.d2vm.save(vec_space_model_path)
 
@@ -87,6 +83,7 @@ def main():
 
     print('Loading source data')
     state = AppState(pd.read_csv(g_data_path + 'train.csv'))
+    state.vector_size = 100;
     add_cleaned_tweets(state)
     add_link_doc_to_id(state)
     load_or_create_vector_space(state)
