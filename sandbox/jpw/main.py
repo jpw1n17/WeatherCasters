@@ -13,8 +13,8 @@ import matplotlib.pyplot as plt
 g_data_path = '../../data/'
 g_output_path = './gen_data/'
 
-# asimple class for holding all state and passing it around
-# for now we will just have a dataframe and dyamically add other properties.
+# a simple class for holding all state and passing it around
+# for now we will just have a dataframe and dynamically add other properties.
 # later we may choose to formalise the class 
 class AppState(object):
     def __init__(self, data_frame):
