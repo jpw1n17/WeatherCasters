@@ -8,11 +8,8 @@ this is a folder to experiment with nltk
 1. conda update conda
 1. conda create -n py35 python=3.5 anaconda
 1. source activate py35
-1. pip install virtualenv
-1. mkdir env
-1. virtualenv env
-1. source env/bin/activate
-1. pip install -r requirements.txt
+1. conda install python.app # mac osx only
+1. pip install -r requirments.txt
 1. python
 	1. import nltk
 	1. nltk.download('stopwords')
