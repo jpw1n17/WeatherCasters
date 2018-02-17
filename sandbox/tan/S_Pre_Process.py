@@ -34,6 +34,8 @@ tokenizer = RegexpTokenizer(regx)
 
 #Get english stopwords
 eng_stopwords = stopwords.words('english') 
+negative_words = ["aren","aren't","couldn","couldn't","didn","didn't","doesn","doesn't","don","don't","hadn","hadn't","hasn","hasn't","haven","haven't","isn","isn't","mightn","mightn't","mustn","mustn't","needn","needn't","no","nor","not","shan","shan't","should've","shouldn","shouldn't","wasn","wasn't","weren","weren't","won","won't","wouldn","wouldn't"]
+stop_words_exclude_neg = list(set(eng_stopwords).difference(negative_words))
 
 #Define Lemmatizer
 lemmatizer = WordNetLemmatizer()
@@ -49,10 +51,9 @@ for tweet in train_data.tweets:
     #Re-initial token list in each round
     filtered_tokens=[] 
     
-    #Remove stop word
-    # ?should we remove stopword? see row 20, 21 as "can't" can tell something about sentiment
+    #Remove stop word but include the negative helping verb
     for word in tokens:
-        if not word in eng_stopwords:
+        if not word in stop_words_exclude_neg:
             #Lemmatize 
             lemmatized = lemmatizer.lemmatize(word, pos="v")
             filtered_tokens.append(lemmatized)
@@ -62,3 +63,4 @@ for tweet in train_data.tweets:
     #tokenized_text
     
 #Tagging
+
