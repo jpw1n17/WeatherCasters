@@ -1,15 +1,11 @@
-##Note Include only these words
-#- tuple[1] start with "V"/
-#- modal verb "MD"/
-#- custom "adv of time", "point of time",/
-#- custom "day, month, year, season, time" day name/ month name/ season name
-# No Lemmatizer
-#remark
+### Description
+# - Tag and Keep Verb, Modal verb, 
+# - Include custome words related to time (adv of time, noun of time)
+# - No lemmatize to prevent tense changing
+# - Lemmatize to Verb form
+#**Remark
 # - after "to" if the word no meaning and lowercase will be verb
  
-
-
-#Some used imp
 import json
 import nltk
 from nltk.corpus import stopwords
@@ -30,7 +26,7 @@ train_data = pd.read_csv('../../data/train.csv'
                          ,header=0,sep=',',error_bad_lines=False,encoding='utf-8')
 
 #Don't care Emoticon
-baseRegx="\w+|\!|\?"
+baseRegx="\w+"
 regx= baseRegx
 tokenized_text = []
 tokenizer = RegexpTokenizer(regx)
