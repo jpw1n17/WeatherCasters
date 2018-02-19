@@ -1,0 +1,18 @@
+﻿open terminal :
+
+set PYTHONHASHSEED=0
+
+python doc2vec_reproduce.py
+
+----
+Result when we set PYTHONHASHSEED=0
+
+[ 0.02201098 -0.16212247]
+[0.02891408 0.18884255]
+
+PYTHONHASHSEED
+----
+
+
+
+
