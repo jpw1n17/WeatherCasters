@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 
 import preprocess.clean
 import regression.linear
+import regression.grad_boost
 
 #global variables
 g_data_path = '../../data/'
@@ -125,13 +126,13 @@ def flatten_results(ts_df, pred_df):
 def evaluate_RMSE(ts_df, pred_df):
     return sklearn.metrics.mean_squared_error(*flatten_results(ts_df, pred_df))**0.5
 
-def gen_graphs(base_title, tr_df, pred_df):
-    graph_dir = g_output_path + 'graphs/'
+def gen_graphs(base_title, target_df, pred_df):
+    graph_dir = g_output_path + 'graphs/'+ base_title + '/'
     makedirs(graph_dir , exist_ok=True)
-    headings = tr_df.columns.values
+    headings = target_df.columns.values
     for c in range(0,g_n_confidence_colums):
         col_name = headings[c + g_confidence_values_offset]
-        actual = tr_df.iloc[:, c + g_confidence_values_offset].values
+        actual = target_df.iloc[:, c + g_confidence_values_offset].values
         pred = pred_df.iloc[:,c]
         plt.clf()
         plt.scatter(actual, pred)
@@ -168,25 +169,65 @@ def extract_doc_vetors(df, d2vm):
         vecs.append(d2vm.docvecs[index_to_tag(index)])
     return vecs
 
+def train_models(model_factory, tr_df, feature_vectors):
+    heading_names = list(tr_df.columns)
+    models = {} # one model per confidence value (24 ih total)
+    for c in range(g_confidence_values_offset, g_confidence_values_offset + g_n_confidence_colums):
+        target = tr_df.iloc[:,c].values
+        model = model_factory()
+        model.fit(feature_vectors, target)
+        models[heading_names[c]] = model
+    return models
+
+def model_predictions(models, feature_vectors):
+    pred_obj = {}
+    for col_name, model in models.items():
+        pred_obj[col_name] = model.predict(feature_vectors)
+    return pd.DataFrame(pred_obj)
+
+def train_and_evaluate_model(
+    model_decsription, model_factory, 
+    tr_feature_vectors, tr_target_df, 
+    ts_feature_vectors, ts_target_df
+):
+    models = train_models(model_factory, tr_target_df, tr_feature_vectors)
+    predictions_df = model_predictions(models, ts_feature_vectors)
+    gen_graphs(model_decsription, ts_target_df, predictions_df)
+    print(model_decsription + ' RMSE ' + str(evaluate_RMSE(ts_target_df, predictions_df)))
+
+def generate_historgrams(folder, target_df):
+    graph_dir = g_output_path + 'graphs/historgrams/' + folder + '/'
+    makedirs(graph_dir , exist_ok=True)
+    bin_count = 50
+    headings = target_df.columns.values
+    for c in range(g_confidence_values_offset, g_confidence_values_offset + g_n_confidence_colums):
+        col_name = headings[c]
+        col_desc = col_name + ':' + condifence_descriptions[col_name]
+        target = target_df.iloc[:,c].values
+        plt.clf()
+        plt.hist(target, bin_count, range=(0.0, 1.0), normed=1, facecolor='green', alpha=0.75)
+        plt.title(col_desc)
+        plt.savefig(graph_dir + col_name)
+
 def main():
     makedirs(g_output_path, exist_ok=True)
 
     print('Loading source data')
     df = load_training_csv(g_data_path + 'train.csv')
     tr, ts = split_data_frame_train_test(df)
+
+    generate_historgrams('training', tr)
+    generate_historgrams('test', ts)
+
     tr_doc_tags = get_doc_tags(get_cleaned_tweets(tr))
     vector_size = 100
     d2vm = load_or_create_vector_space(tr_doc_tags, vector_size)
     
-    # train the regression model
     tr_doc_vecs = extract_doc_vetors(tr, d2vm)
-    lrms = regression.linear.train_model(tr, tr_doc_vecs)
+    ts_doc_vecs = infer_vector_space(ts.tweet.values, d2vm)
 
-    # test the model
-    ts_dvs = infer_vector_space(ts.tweet.values, d2vm)
-    pred_df = regression.linear.make_predictions(lrms, ts, ts_dvs)
-    gen_graphs('Linear Regression', ts, pred_df)
-    print('linear regression RMSE ' + str(evaluate_RMSE(ts, pred_df)))
+    #train_and_evaluate_model('linear_regression', regression.linear.create_model, tr_doc_vecs, tr, ts_doc_vecs, ts)
+    train_and_evaluate_model('gradient_boosting', regression.grad_boost.create_model, tr_doc_vecs, tr, ts_doc_vecs, ts)
    
 # start of main script 
 main()
