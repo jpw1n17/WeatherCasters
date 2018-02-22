@@ -14,6 +14,35 @@ import regression.linear
 #global variables
 g_data_path = '../../data/'
 g_output_path = './gen_data/'
+g_confidence_values_offset = 4
+g_n_confidence_colums = 24
+
+condifence_descriptions = {
+    "s1":"Sentiment - I can't tell",
+    "s2":"Sentiment - Negative",
+    "s3":"Sentiment - Neutral / author is just sharing information",
+    "s4":"Sentiment - Positive",
+    "s5":"Sentiment - Tweet not related to weather condition",
+    "w1":"Weather tense - current (same day) weather",
+    "w2":"Weather tense - future (forecast)",
+    "w3":"Weather tense - I can't tell",
+    "w4":"Weather tense - past weather",
+    "k1":"Weather state - clouds",
+    "k2":"Weather state - cold",
+    "k3":"Weather state - dry",
+    "k4":"Weather state - hot",
+    "k5":"Weather state - humid",
+    "k6":"Weather state - hurricane",
+    "k7":"Weather state - I can't tell",
+    "k8":"Weather state - ice",
+    "k9":"Weather state - other",
+    "k10":"Weather state - rain",
+    "k11":"Weather state - snow",
+    "k12":"Weather state - storms",
+    "k13":"Weather state - sun",
+    "k14":"Weather state - tornado",
+    "k15":"Weather state - wind"
+}
 
 def index_to_tag(index):
     return 'index_' + str(index)
@@ -78,31 +107,43 @@ def split_data_frame_train_test(df):
     return df[selection_mask], df[~selection_mask]
 
 # RMSE = sqrt(sum(i= 1 to n, (pi - ai)^2)/n)
-# n is 24 times the total number of tweets
+# n is g_n_confidence_colums times the total number of tweets
 # pi is the predicted confidence rating for a given label
 # ai is the actual confidence rating for a given label
 # 
 # moving divide by n into sum to prevent overflow
-def evaluate_RMSE_hand_cranked(state, pred):
-    sum_error = 0.0
-    total_elements = 24 * len(state.ts)
-    # confidence values in columns 4 to 27
-    source_data_output_col_offset = 4
-    for r in range(len(state.ts)):
-        for c in range(0, 23):
-            pi = pred.iloc[:, c + 1] # first col id
-            ai = state.ts.iloc(r, c + source_data_output_col_offset)
-            sum_error = sum_error + (((pi - ai)**2) / total_elements)
-    return sum_error**(0.5)
 
-def evaluate_RMSE(tr_df, pred_df):
-    if len(tr_df) != len(pred_df):
-        raise Exception('inconsistent lengths')
-    piv = pred_df.iloc[:, 0:24].values
-    aiv = tr_df.iloc[:, 4:28].values
-    pis = np.concatenate(piv)
-    ais = np.concatenate(aiv)
-    return sklearn.metrics.mean_squared_error(pis, ais)
+def flatten_data_frame(df, c1, c2):
+    nmpy_array = df.iloc[:, c1:c2].values
+    return np.concatenate(nmpy_array)
+
+def flatten_results(ts_df, pred_df):
+    ais = flatten_data_frame(ts_df, g_confidence_values_offset, g_confidence_values_offset + g_n_confidence_colums)
+    pis = flatten_data_frame(pred_df, 0, g_n_confidence_colums)
+    return ais, pis
+
+def evaluate_RMSE(ts_df, pred_df):
+    return sklearn.metrics.mean_squared_error(*flatten_results(ts_df, pred_df))**0.5
+
+def gen_graphs(base_title, tr_df, pred_df):
+    graph_dir = g_output_path + 'graphs/'
+    makedirs(graph_dir , exist_ok=True)
+    headings = tr_df.columns.values
+    for c in range(0,g_n_confidence_colums):
+        col_name = headings[c + g_confidence_values_offset]
+        actual = tr_df.iloc[:, c + g_confidence_values_offset].values
+        pred = pred_df.iloc[:,c]
+        plt.clf()
+        plt.scatter(actual, pred)
+        plt.title(base_title + '\n' + col_name + ':' + condifence_descriptions[col_name])
+        plt.xlabel('Actual')
+        plt.xlim(0.0, 1.0)
+        plt.ylabel('Prediction')
+        plt.ylim(-1.0, 1.0)
+        # plot ideal fit guide line
+        plt.plot((0,1), 'r--')
+        plt.savefig(graph_dir + col_name)
+    plt.close()
 
 def infer_vector_space(raw_doc, d2vm):
     dvs = []
@@ -144,7 +185,8 @@ def main():
     # test the model
     ts_dvs = infer_vector_space(ts.tweet.values, d2vm)
     pred_df = regression.linear.make_predictions(lrms, ts, ts_dvs)
-    print('linear regression error ' + str(evaluate_RMSE(ts, pred_df)))
-
+    gen_graphs('Linear Regression', ts, pred_df)
+    print('linear regression RMSE ' + str(evaluate_RMSE(ts, pred_df)))
+   
 # start of main script 
 main()
