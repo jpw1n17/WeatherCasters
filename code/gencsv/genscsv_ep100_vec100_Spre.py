@@ -130,14 +130,29 @@ docvecs = []
 
 # Append a vector of each tweet
 for i in range(0,len(model.docvecs)) :
-    #docvec = model.docvecs[i]
-    #print (docvec)
-    docvecs.append(docvec)
+    twt = model.docvecs[i]
+    # print (twt)
+    docvecs.append(twt)
+
+    
+# Drop to get only output columns
+#"s1", "s2", "s3", "s4", "s5", "w1", "w2", "w3", "w4", "k1", "k2", "k3", "k4", "k5", "k6", "k7", "k8", "k9", "k10", "k11", "k12", "k13", "k14", "k15"
+out_data = train_data.drop(columns=["id", "tweets", "state", "location"], axis=1)   
+out_list = out_data.values.tolist()
+
+
+# Create a list of inputs and outputs (numerical data)
+features = []
+num_data = []
+
+for nn in range(0,len(docvecs)):       
+    features = list(docvecs[nn])  
+    features.extend(out_list[nn])
+    num_data.append(features)
 
 
 # Write csv file
-    
-np.savetxt('gencsv_ep100_vec100_Spre.txt',docvecs,fmt='%.8f',delimiter='\t', comments='')
+np.savetxt('gencsv_ep100_vec100_Spre.txt',num_data,fmt='%.8f',delimiter='\t', comments='')
 
 train_data = pd.read_csv('gencsv_ep100_vec100_Spre.txt'
                          ,header=None,sep='\t',error_bad_lines=False,encoding='utf-8')
