@@ -34,9 +34,8 @@ train_data = pd.read_csv('../../data/train.csv'
 # Specify a path for local directory of data file
 #file_path_1 = 'D:/Champ/AnacondaProjects/WeatherCasters/Local/data/train.csv'
 #train_data = pd.read_csv(file_path_1
-#                         ,names = ["id", "tweets", "state", "location", "s1", "s2", "s3", "s4", "s5", "w1", "w2", "w3", "w4", "k1", "k2", "k3", "k4", "k5", "k6", "k7", "k8", "k9", "k10", "k11", "k12", "k13", "k14", "k15"]
-#                         ,header=0,sep=',',error_bad_lines=False,encoding='utf-8')
-
+#                        ,names = ["id", "tweets", "state", "location", "s1", "s2", "s3", "s4", "s5", "w1", "w2", "w3", "w4", "k1", "k2", "k3", "k4", "k5", "k6", "k7", "k8", "k9", "k10", "k11", "k12", "k13", "k14", "k15"]
+#                        ,header=0,sep=',',error_bad_lines=False,encoding='utf-8')
 
 
 # Need to change the id number to become text to use as tag of documents 
@@ -138,7 +137,7 @@ for i in range(0,len(model.docvecs)) :
 # Drop to get only output columns
 #"s1", "s2", "s3", "s4", "s5", "w1", "w2", "w3", "w4", "k1", "k2", "k3", "k4", "k5", "k6", "k7", "k8", "k9", "k10", "k11", "k12", "k13", "k14", "k15"
 out_data = train_data.drop(columns=["id", "tweets", "state", "location"], axis=1)   
-out_list = out_data.values.tolist()
+out_data = out_data.values.tolist()
 
 
 # Create a list of inputs and outputs (numerical data)
@@ -147,15 +146,17 @@ num_data = []
 
 for nn in range(0,len(docvecs)):       
     features = list(docvecs[nn])  
-    features.extend(out_list[nn])
+    features.extend(out_data[nn])
     num_data.append(features)
 
 
 # Write csv file
 np.savetxt('gencsv_ep100_vec100_Spre.txt',num_data,fmt='%.8f',delimiter='\t', comments='')
 
-train_data = pd.read_csv('gencsv_ep100_vec100_Spre.txt'
-                         ,header=None,sep='\t',error_bad_lines=False,encoding='utf-8')
+
+# Read numberical data into num_data
+#num_data = pd.read_csv('gencsv_ep100_vec100_Spre.txt'
+#                        ,header=None,sep='\t',error_bad_lines=False,encoding='utf-8')
 
 
 
