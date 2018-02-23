@@ -7,5 +7,6 @@ scikit-neuralnetwork
 tensorflow
 keras
 matplotlib
+xgboost
 
 

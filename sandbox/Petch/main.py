@@ -7,6 +7,9 @@ Created on Wed Feb 14 16:54:52 2018
 #Import all the dependencies
 import gensim
 import csv
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+import numpy as np
 from nltk import RegexpTokenizer
 from nltk.corpus import stopwords
 from os import listdir
@@ -55,7 +58,27 @@ def create_model(it, size):
     #start testing
     #printing the vector of document at index 1 in docLabels
     docvec = d2v_model.docvecs[1]
-    print (docvec)
+    for i in range(0, 19):
+        docvec = d2v_model.docvecs[i]
+        print(train_data[i])
+        print(docvec)
+        
+        # 2d version
+        #plt.quiver([0], [0], [docvec.item(0)], [docvec.item(1)], angles='xy', scale_units='xy', scale=1)
+        #plt.xlim(-0.3, 0.3)
+        #plt.ylim(-0.3, 0.3)
+        #plt.grid(True)
+        #plt.show
+        
+        # 3d version
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection='3d')
+        ax.quiver([0], [0], [0], [docvec.item(0)], [docvec.item(1)], [docvec.item(2)])
+        ax.set_xlim([-0.2, 0.2])
+        ax.set_ylim([-0.2, 0.2])
+        ax.set_zlim([-0.2, 0.2])
+        plt.show()
+        
     
     #printing the vector of the file using its name
     #docvec = d2v_model.docvecs[data[0]] #if string tag used in training
@@ -63,7 +86,7 @@ def create_model(it, size):
     
     #to get most similar document with similarity scores using document-index
     similar_doc = d2v_model.docvecs.most_similar(0) 
-    print (similar_doc)
+    #print (similar_doc)
     
     #to get most similar document with similarity scores using document- name
     #sims = d2v_model.docvecs.most_similar(data[0])
@@ -95,5 +118,5 @@ data = nlp_clean(data)
 
 #iterator returned over all documents
 it = LabeledLineSentence(data, docLabels)
-create_model(it, 10)
-create_model(it, 2)
+#create_model(it, 10)
+create_model(it, 3)
