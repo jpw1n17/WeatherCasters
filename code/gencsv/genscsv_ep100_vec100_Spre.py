@@ -31,10 +31,21 @@ train_data = pd.read_csv('../../data/train.csv'
                          ,names = ["id", "tweets", "state", "location", "s1", "s2", "s3", "s4", "s5", "w1", "w2", "w3", "w4", "k1", "k2", "k3", "k4", "k5", "k6", "k7", "k8", "k9", "k10", "k11", "k12", "k13", "k14", "k15"]
                         ,header=0,sep=',',error_bad_lines=False,encoding='utf-8')
 
+# Specify a path for local directory of data file
 #file_path_1 = 'D:/Champ/AnacondaProjects/WeatherCasters/Local/data/train.csv'
 #train_data = pd.read_csv(file_path_1
 #                         ,names = ["id", "tweets", "state", "location", "s1", "s2", "s3", "s4", "s5", "w1", "w2", "w3", "w4", "k1", "k2", "k3", "k4", "k5", "k6", "k7", "k8", "k9", "k10", "k11", "k12", "k13", "k14", "k15"]
 #                         ,header=0,sep=',',error_bad_lines=False,encoding='utf-8')
+
+
+
+# Need to change the id number to become text to use as tag of documents 
+# for example
+# 'id'+str(train_data.id[0])
+# this simple code will produce a list of ['id1', 'id2', 'id5',...,'id100,...]
+tag_id = []
+for tid in train_data.id:
+    tag_id.append('id'+str(tid)) 
 
 #Define Emoticon list
 emolist = list(emot.EMOTICONS.keys())
@@ -88,7 +99,7 @@ class LabeledLineSentence(object):
               yield gensim.models.doc2vec.TaggedDocument(doc,[self.labels_list[idx]])
 
 # Iterator of tagged documents
-iter_tag_doc = LabeledLineSentence(tokenized_text, train_data.id)
+iter_tag_doc = LabeledLineSentence(tokenized_text, tag_id)
 
 
 # Create a Doc2Vec model
