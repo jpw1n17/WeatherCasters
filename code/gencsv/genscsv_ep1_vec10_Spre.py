@@ -102,7 +102,7 @@ iter_tag_doc = LabeledLineSentence(tokenized_text, tag_id)
 
 
 # Create a Doc2Vec model
-model = gensim.models.Doc2Vec(size=100, min_count=0
+model = gensim.models.Doc2Vec(size=10, min_count=0
                               , alpha=0.025, min_alpha=0.025
                               , seed=0, workers=1)
 
@@ -111,7 +111,7 @@ model.build_vocab(iter_tag_doc)
 print( 'number of vocabulary : ' + str(len(model.wv.vocab)) )
 
 # Train the doc2vec model
-for epoch in range(100):    # number of epoch
+for epoch in range(1):    # number of epoch
  #print( 'iteration '+str(epoch+1) )
  model.train(iter_tag_doc, total_examples=len(tokenized_text), epochs=1 )
  # Change learning rate for next epoch
@@ -151,12 +151,12 @@ for nn in range(0,len(docvecs)):
 
 
 # Write csv file
-np.savetxt('gencsv_ep100_vec100_Spre.txt',num_data,fmt='%.8f',delimiter=',', comments='')
+np.savetxt('gencsv_ep1_vec10_Spre.txt',num_data,fmt='%.8f',delimiter=',', comments='')
 
 print( 'saved txt file : ' + str(len(num_data)) + ' records')
 
 # Read numberical data into num_data
-#num_data = pd.read_csv('gencsv_ep100_vec100_Spre.txt'
+#num_data = pd.read_csv('gencsv_ep1_vec10_Spre.txt'
 #                        ,header=None,sep='\t',error_bad_lines=False,encoding='utf-8')
 
 
