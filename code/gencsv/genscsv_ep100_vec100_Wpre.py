@@ -148,7 +148,7 @@ for nn in range(0,len(docvecs)):
 
 
 # Write csv file
-np.savetxt('gencsv_ep100_vec100_Wpre.txt',num_data,fmt='%.8f',delimiter=',', comments='')
+np.savetxt('gencsv_ep100_vec100_Wpre.txt',num_data,fmt='%.8f',delimiter='\t', comments='')
 
 print( 'saved txt file : ' + str(len(num_data)) + ' records')
 
