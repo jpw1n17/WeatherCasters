@@ -24,9 +24,13 @@ import emot
 import gensim
 import matplotlib.pyplot as plt
 import numpy as np
+import datetime as dt
 
 
- # Load a CSV	
+# Show start time of this program
+print('start time : '+str(dt.datetime.now()) )
+
+# Load a CSV	
 train_data = pd.read_csv('../../data/train.csv'
                          ,names = ["id", "tweets", "state", "location", "s1", "s2", "s3", "s4", "s5", "w1", "w2", "w3", "w4", "k1", "k2", "k3", "k4", "k5", "k6", "k7", "k8", "k9", "k10", "k11", "k12", "k13", "k14", "k15"]
                         ,header=0,sep=',',error_bad_lines=False,encoding='utf-8')
@@ -151,12 +155,15 @@ for nn in range(0,len(docvecs)):
 
 
 # Write csv file
-np.savetxt('gencsv_ep100_vec100_Spre.txt',num_data,fmt='%.8f',delimiter='\t', comments='')
+np.savetxt('gencsv_ep100_vec100_Spre.txt',num_data,fmt='%.8f',delimiter=',', comments='')
 
+print( 'saved txt file : ' + str(len(num_data)) + ' records')
 
 # Read numberical data into num_data
 #num_data = pd.read_csv('gencsv_ep100_vec100_Spre.txt'
 #                        ,header=None,sep='\t',error_bad_lines=False,encoding='utf-8')
 
 
+# Show finish time of this program
+print('finish time : '+str(dt.datetime.now()) )
 
