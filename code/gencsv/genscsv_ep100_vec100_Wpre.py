@@ -85,6 +85,7 @@ for tweet in train_data.tweets:
     #Append each tokenized tweet in the list
     tokenized_text.append(append_pos) 
 
+###############################################################################
 # This iterator returns tagged documents which are tweets with doc label 
 class LabeledLineSentence(object):
     def __init__(self, doc_list, labels_list):
@@ -120,7 +121,6 @@ print( 'model trained' )
 #saving the created model
 #model.save('doc2vec.model')
 #print( 'model saved' )
-
 
 docvecs = []
 
