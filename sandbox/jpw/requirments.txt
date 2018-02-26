@@ -5,6 +5,7 @@ pandas
 scikit-learn
 scikit-neuralnetwork
 tensorflow
+theano==0.7
 keras
 matplotlib
 xgboost

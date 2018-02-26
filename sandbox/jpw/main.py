@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import preprocess.clean
 import regression.linear
 import regression.grad_boost
+import regression.sknn
 
 #global variables
 g_data_path = '../../data/'
@@ -146,12 +147,6 @@ def gen_graphs(base_title, target_df, pred_df):
         plt.savefig(graph_dir + col_name)
     plt.close()
 
-def infer_vector_space(raw_doc, d2vm):
-    dvs = []
-    for doc in raw_doc:
-        dvs.append(d2vm.infer_vector(preprocess.clean.clean_str(doc)))
-    return dvs
-
 def load_training_csv(path):
     # need to force types on the numeric columns for compatibility with sklearn libraries
     column_types = {'id':np.str, 'tweet':np.str, 'state':np.str, 'location':np.str, 
@@ -164,34 +159,47 @@ def load_training_csv(path):
     return pd.read_csv(path, dtype=column_types)
 
 def extract_doc_vetors(df, d2vm):
-    vecs = []
-    for index, dummy_row in df.iterrows():
-        vecs.append(d2vm.docvecs[index_to_tag(index)])
+    vecs = pd.DataFrame(index=df.index)
+    for i in df.index:
+        tag = index_to_tag(i)
+        row = d2vm.docvecs[tag]
+        vecs.loc[i] = pd.Series(row)
     return vecs
 
-def train_models(model_factory, tr_df, feature_vectors):
+def infer_vector_space(df, d2vm):
+    vecs = pd.DataFrame(index=df.index)
+    for index, doc in df.tweet.iteritems():
+        clean_word_list = preprocess.clean.clean_str(doc)
+        row = d2vm.infer_vector(clean_word_list)
+        vecs.loc[index] = pd.Series(row)
+    return vecs
+
+def train_models(model_factory, tr_df, feature_vectors_series):
     heading_names = list(tr_df.columns)
     models = {} # one model per confidence value (24 ih total)
     for c in range(g_confidence_values_offset, g_confidence_values_offset + g_n_confidence_colums):
         target = tr_df.iloc[:,c].values
         model = model_factory()
-        model.fit(feature_vectors, target)
+        model.fit(feature_vectors_series, target)
         models[heading_names[c]] = model
     return models
 
-def model_predictions(models, feature_vectors):
+def model_predictions(models, feature_vectors_series):
     pred_obj = {}
     for col_name, model in models.items():
-        pred_obj[col_name] = model.predict(feature_vectors)
+        pred_obj[col_name] = model.predict(feature_vectors_series)
     return pd.DataFrame(pred_obj)
 
 def train_and_evaluate_model(
     model_decsription, model_factory, 
-    tr_feature_vectors, tr_target_df, 
-    ts_feature_vectors, ts_target_df
+    tr_feature_vectors_series, tr_target_df, 
+    ts_feature_vectors_series, ts_target_df
 ):
-    models = train_models(model_factory, tr_target_df, tr_feature_vectors)
-    predictions_df = model_predictions(models, ts_feature_vectors)
+    print('training ' + model_decsription)
+    models = train_models(model_factory, tr_target_df, tr_feature_vectors_series)
+    print('testing model')
+    predictions_df = model_predictions(models, ts_feature_vectors_series)
+    print('generating results')
     gen_graphs(model_decsription, ts_target_df, predictions_df)
     print(model_decsription + ' RMSE ' + str(evaluate_RMSE(ts_target_df, predictions_df)))
 
@@ -209,6 +217,34 @@ def generate_historgrams(folder, target_df):
         plt.title(col_desc)
         plt.savefig(graph_dir + col_name)
 
+def get_doc_vectors(tr, ts):
+    doc_vec_path = g_output_path + '/doc_vectors/'
+    makedirs(doc_vec_path , exist_ok=True)
+    tr_dv_path = doc_vec_path + 'training'
+    ts_dv_path = doc_vec_path + 'test'
+    tr_doc_vecs_df = None
+    ts_doc_vecs_df = None
+
+    if not exists(tr_dv_path) or not exists(ts_dv_path):
+        tr_doc_tags = get_doc_tags(get_cleaned_tweets(tr))
+        d2vm = load_or_create_vector_space(tr_doc_tags, vector_size = 100)
+        
+        print('Extracting training doc vectors')
+        tr_doc_vecs_df = extract_doc_vetors(tr, d2vm)
+        with open(tr_dv_path, 'w') as tr_f:
+            tr_doc_vecs_df.to_csv(tr_f)
+
+        print('Infering test doc vectors')
+        ts_doc_vecs_df = infer_vector_space(ts, d2vm)
+        with open(ts_dv_path, 'w') as ts_f:
+            ts_doc_vecs_df.to_csv(ts_f)
+    
+    print('Loading doc vectors')
+    tr_doc_vecs_df = pd.read_csv(tr_dv_path)
+    ts_doc_vecs_df = pd.read_csv(ts_dv_path)
+
+    return tr_doc_vecs_df, ts_doc_vecs_df
+    
 def main():
     makedirs(g_output_path, exist_ok=True)
 
@@ -219,15 +255,11 @@ def main():
     generate_historgrams('training', tr)
     generate_historgrams('test', ts)
 
-    tr_doc_tags = get_doc_tags(get_cleaned_tweets(tr))
-    vector_size = 100
-    d2vm = load_or_create_vector_space(tr_doc_tags, vector_size)
-    
-    tr_doc_vecs = extract_doc_vetors(tr, d2vm)
-    ts_doc_vecs = infer_vector_space(ts.tweet.values, d2vm)
-
-    #train_and_evaluate_model('linear_regression', regression.linear.create_model, tr_doc_vecs, tr, ts_doc_vecs, ts)
-    train_and_evaluate_model('gradient_boosting', regression.grad_boost.create_model, tr_doc_vecs, tr, ts_doc_vecs, ts)
+    tr_doc_vecs_df, ts_doc_vecs_df = get_doc_vectors(tr, ts)
+   
+    train_and_evaluate_model('linear_regression', regression.linear.create_model, tr_doc_vecs_df, tr, ts_doc_vecs_df, ts)
+    #train_and_evaluate_model('gradient_boosting', regression.grad_boost.create_model, tr_doc_vecs, tr, ts_doc_vecs, ts)
+    #train_and_evaluate_model('multi_layer_perceptron', regression.sknn.create_model, tr_doc_vecs_df, tr, ts_doc_vecs_df, ts)
    
 # start of main script 
 main()
