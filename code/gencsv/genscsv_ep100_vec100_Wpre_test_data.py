@@ -27,14 +27,24 @@ import datetime as dt
 print('start time : '+str(dt.datetime.now()) )
 
  # Load a CSV	
-test_data = pd.read_csv('../../data/test.csv'
-                         ,names = ["id", "tweets", "state", "location"]
+train_data = pd.read_csv('../../data/train.csv'
+                         ,names = ["id", "tweets", "state", "location", "s1", "s2", "s3", "s4", "s5", "w1", "w2", "w3", "w4", "k1", "k2", "k3", "k4", "k5", "k6", "k7", "k8", "k9", "k10", "k11", "k12", "k13", "k14", "k15"]
                         ,header=0,sep=',',error_bad_lines=False,encoding='utf-8')
+
+
+test_data = pd.read_csv('../../data/test.csv'
+                         , names = ["id", "tweets", "state", "location"]
+                         , header=0, sep=',', error_bad_lines = False, encoding='utf-8')
+
+
+
+
+##### TRAIN PART
 
 
 # Change the id number to become text to use as tag of documents 
 tag_id = []
-for tid in test_data.id:
+for tid in train_data.id:
     tag_id.append('id'+str(tid)) 
 
 #Define Emoticon list
@@ -55,7 +65,7 @@ time_custom = ["forecast","day","month","year","season"]
 time_word_list = time_adv + time_noun + time_month + time_day + time_season + time_custom
 
 #Start pre-processing
-for tweet in test_data.tweets:
+for tweet in train_data.tweets:
     #Tokenize
     tokens = tokenizer.tokenize(tweet)   
                
@@ -103,7 +113,7 @@ for epoch in range(100):    # number of epoch
  #print( 'iteration '+str(epoch+1) )
  model.train(iter_tag_doc, total_examples=len(tokenized_text), epochs=1 )
  # Change learning rate for next epoch
- model.alpha -= 0.002
+ model.alpha -= 0.002       # decreasing 0.002 /epoch 
  model.min_alpha = model.alpha
 print( 'model trained' )
 
@@ -120,10 +130,10 @@ for i in range(0,len(model.docvecs)) :
     # print (twt)
     docvecs.append(twt)
 
-    
+    #####
 # Drop to get only output columns
 
-out_data = test_data.drop(columns=["id", "tweets", "state", "location"], axis=1)   
+out_data = train_data.drop(columns=["id", "tweets", "state", "location"], axis=1)   
 out_data = out_data.values.tolist()
 
 
@@ -137,8 +147,58 @@ for nn in range(0,len(docvecs)):
     num_data.append(features)
 
 
+
+######################################### TEST PART #########################################
+
+tag_id_test = []
+for tid_test in test_data.id:
+    tag_id_test.append('id'+str(tid_test)) 
+
+#Define Emoticon list
+baseRegx_test="\w+"
+regx_test= baseRegx_test
+tokenized_text_test = []
+tokenizer_test = RegexpTokenizer(regx_test)
+
+#Start pre-processing
+for tweet_test in test_data.tweets:
+    #Tokenize
+    tokens_test = tokenizer_test.tokenize(tweet_test)   
+               
+    #Pos tagging
+    append_pos_test = []
+    tagged_tokens_test = nltk.pos_tag(tokens_test)
+    for posTag_test in tagged_tokens_test: 
+        # Tagging is case sensitive, so lowwer needs to be after
+        lower_word_test = posTag_test[0].lower()
+        
+        #Keep all verbs, Modal verb, words of time 
+        if (posTag_test[1].startswith("V") 
+            or posTag_test[1] == "MD" 
+            or lower_word_test in time_word_list) :
+            append_pos_test.append(lower_word_test)  
+            
+    #Append each tokenized tweet in the list
+    tokenized_text_test.append(append_pos_test) 
+
+
+
+############################### PART WITH ISSUE ###############################
+
+# Infered vector from test set tokenised 
+token_test = []
+    
+for j in range(0,len(model.docvecs)):   #docvecs : holds all trained vectors
+    tokenized_test = model.docvecs[j]
+    docvec_test = model.infer_vector(tokenized_test[j])
+    #print (docvec_test)
+    token_test.append(docvec_test)
+
+###############################################################################
+
+
 # Write csv file
-np.savetxt('gencsv_ep100_vec100_Wpre_test_data.txt',num_data,fmt='%.8f',delimiter='\t', comments='')
+np.savetxt('gencsv_ep100_vec100_Wpre_test_data_2.txt',num_data,fmt='%.8f',delimiter='\t', comments='')
 
 print( 'saved txt file : ' + str(len(num_data)) + ' records')
 
