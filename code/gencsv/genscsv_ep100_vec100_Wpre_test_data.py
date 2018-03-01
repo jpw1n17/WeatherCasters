@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Feb 26 15:54:24 2018
+Created on Wed Feb 28 20:49:38 2018
 
-@author: audeb
+@author: SUSMITA
 """
-
 
 import json
 import nltk
@@ -21,18 +20,19 @@ import emot
 import gensim
 import matplotlib.pyplot as plt
 import numpy as np
+from gensim.models.doc2vec import Doc2Vec, TaggedDocument
 import datetime as dt
 
 # Show start time of this program
 print('start time : '+str(dt.datetime.now()) )
 
  # Load a CSV	
-train_data = pd.read_csv('../../data/train.csv'
+train_data = pd.read_csv(r'A:\sem2\data mining\group project\data\train.csv'
                          ,names = ["id", "tweets", "state", "location", "s1", "s2", "s3", "s4", "s5", "w1", "w2", "w3", "w4", "k1", "k2", "k3", "k4", "k5", "k6", "k7", "k8", "k9", "k10", "k11", "k12", "k13", "k14", "k15"]
                         ,header=0,sep=',',error_bad_lines=False,encoding='utf-8')
 
 
-test_data = pd.read_csv('../../data/test.csv'
+test_data = pd.read_csv(r'A:\sem2\data mining\group project\data\test.csv'
                          , names = ["id", "tweets", "state", "location"]
                          , header=0, sep=',', error_bad_lines = False, encoding='utf-8')
 
@@ -183,17 +183,26 @@ for tweet_test in test_data.tweets:
 
 
 
-############################### PART WITH ISSUE ###############################
+############################### PART TO CHECK ###############################
 
 # Infered vector from test set tokenised 
 token_test = []
     
-for j in range(0,len(model.docvecs)):   #docvecs : holds all trained vectors
-    tokenized_test = model.docvecs[j]
-    docvec_test = model.infer_vector(tokenized_test[j])
+for j in (tokenized_text_test):   #docvecs : holds all trained vectors
+   # tokenized_test = model.docvecs[j]
+    docvec_test = model.infer_vector(j)
     #print (docvec_test)
     token_test.append(docvec_test)
 
+################################sample code#############################
+#known_words = "love cute cats".split()
+#unknown_words = "astronaut kisses moon".split()
+#mixed_words = "the albatross is chicken".split()
+#for words in (known_words, unknown_words, mixed_words):
+    #v1 = model.infer_vector(words)
+    #for i in xrange(100):
+        #v2 = model.infer_vector(words)
+        #assert np.all(v1 == v2), "Failed on %s" % (" ".join(words))
 ###############################################################################
 
 
