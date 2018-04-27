@@ -64,7 +64,7 @@ print("RMSE:"+str(rmse))
 #======Compare result
 import matplotlib.pyplot as plt
 plt.scatter(y_test, y_pred)
-plt.title('Actual vs Predicted');plt.xlabel('Actual');plt.ylabel('Predicted')
+plt.title('Actual vs Predicted for W_Vector');plt.xlabel('Actual');plt.ylabel('Predicted')
 plt.ylim(0, 1)
 
 #======Compare result distribution
