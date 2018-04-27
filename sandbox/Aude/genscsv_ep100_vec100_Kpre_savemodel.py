@@ -23,6 +23,8 @@ import gensim
 import matplotlib.pyplot as plt
 import numpy as np
 
+# Show start time of this program
+print('start time : '+str(dt.datetime.now()) )
 
  # Load a CSV	
 train_data = pd.read_csv('../../data/train.csv'
