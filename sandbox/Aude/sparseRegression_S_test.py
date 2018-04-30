@@ -99,8 +99,6 @@ Test = pd.read_csv('test.csv'
 xts = Spre_Test
 test_row_id = Test["id"].astype(int)
 
-
-
 # =============================================================================
 # train model
 # =============================================================================
@@ -127,7 +125,10 @@ yhts = yhts[cols]
 
 print( 'number of records : ' + str(len(yhts)) )
 
-np.savetxt('gencsv_ep100_vec100_Spre_predict.csv',yhts,fmt='%.8f',delimiter=',', comments='', header ="id,s1,s2,s3,s4,s5,w1,w2,w3,w4,k1,k2,k3,k4,k5,k6,k7,k8,k9,k10,k11,k12,k13,k14,k15")
+#np.savetxt('gencsv_ep100_vec100_Spre_predict.csv',yhts,fmt='%.8f',delimiter=',', comments='', header ="id,s1,s2,s3,s4,s5,w1,w2,w3,w4,k1,k2,k3,k4,k5,k6,k7,k8,k9,k10,k11,k12,k13,k14,k15")
+
+np.savetxt('gencsv_ep100_vec100_Spre_predict.csv',yhts,fmt=' '.join(['%i'] + ['%.8f']*24),delimiter=',', comments='', header ="id,s1,s2,s3,s4,s5,w1,w2,w3,w4,k1,k2,k3,k4,k5,k6,k7,k8,k9,k10,k11,k12,k13,k14,k15")
+
 
 # =============================================================================
 # 
