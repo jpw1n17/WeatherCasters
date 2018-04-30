@@ -1,9 +1,16 @@
 # W-Vector
 
-import numpy as np
+import numpy
 import matplotlib.pyplot as plt
 import pandas as pd
-
+import pickle
+import math
+from sklearn.metrics import mean_squared_error
+from sklearn.cross_validation import train_test_split
+import lightgbm as lgb
+def save_object(obj, filename):
+    with open(filename, 'wb') as output:  # Overwrites any existing file.
+        pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
 
 #====== Prepare data
 dataset = pd.read_csv('../../../code/gencsv/gencsv_ep100_vec100_Wpre/gencsv_ep100_vec100_Wpre.txt', sep = '\t', header = None)
@@ -12,11 +19,14 @@ outputlen = 24
 inputlen = datalen-outputlen
 
 X = dataset[dataset.columns[0:inputlen]].values
-X = dataset[dataset.columns[0:inputlen]].values
 
 result = []
-for idx, i in enumerate(range(6,9)):
-    print("round: " + str(idx))
+model = []
+predicted = []
+actual = []
+
+for idx, i in enumerate(range(1,25)):
+    print("...training data: " + str(idx))
     # s[1:5]: 's1','s2','s3','s4','s5'
     # w[6:9]: 'w1','w2','w3','w4'
     #,k[10:24]: 'k1','k2','k3','k4','k5','k6','k7','k8','k9','k10','k11','k12','k13','k14','k15']
@@ -25,7 +35,7 @@ for idx, i in enumerate(range(6,9)):
     y = dataset[dataset.columns[inputlen-1+selected_output]].values
     
     from sklearn.cross_validation import train_test_split
-    x_train, x_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 0)
+    x_train, x_test, y_train, y_test = train_test_split(X, y, test_size = 0.20, random_state = 0)
     ## Feature Scaling
     #from sklearn.preprocessing import StandardScaler
     #sc = StandardScaler()
@@ -59,38 +69,50 @@ for idx, i in enumerate(range(6,9)):
     
     #======Evaluation
     #RMSE
-    import math
-    from sklearn.metrics import mean_squared_error
     rmse=math.sqrt(mean_squared_error(y_pred,y_test))
     print("RMSE_"+ str(i) + ":" +str(rmse))
+    
+    predicted.append(y_pred)
+    actual.append(y_test)
     result.append(rmse)
 
-rmse_mean = np.mean(result);
-print("RMSE :"+ str(rmse_mean));
+# sample usage
+save_object(model, 'all_model_trained_by_W-data.pkl')
+save_object(actual, 'actual_by_W-data.pkl')
+save_object(predicted, 'predicted_by_W-data.pkl')
 
-#RMSE gencsv_ep100_vec100_Wpre:0.2653909955406634
+#RMSE gencsv_ep100_vec100_Wpre:0.2663189742184093
 
-#======Compare result
-import matplotlib.pyplot as plt
-plt.scatter(y_test, y_pred)
-plt.title('Actual vs Predicted for W_Vector');plt.xlabel('Actual');plt.ylabel('Predicted')
-plt.ylim(0, 1)
+print(result)
+avg_result = numpy.mean(result)
+print("AVG of W-RMSE: "+ str(avg_result))
 
+N = len(result)
+x = range(1,N+1)
 
-#======Compare result distribution
-n_bins=100
-fig, axs = plt.subplots(1, 2, sharey=True, sharex=False, tight_layout=True)
-# We can set the number of bins with the `bins` kwarg
-axs[0].hist(y_test, bins=n_bins)
-axs[1].hist(y_pred, bins=n_bins)
+ax = plt.subplot(111)
+ax.set_title('RMSE from model trained by W-pre data')
+ax.set_xlabel('output index')
+ax.set_xticks(x)
+ax.set_ylabel('RMSE')
+ax.bar(x, result)
+ax.axhline(y=avg_result, color='r', linestyle='-')
 
-#plt.subplot(121)
-#plt.hist(y_test, bins=n_bins)
-#plt.title('Actual')
-#plt.ylabel('Frequency')
-#plt.suptitle('Histogram Actual vs Predicted', fontsize=16)
+#RMSE gencsv_ep100_vec100_Wpre:0.3096713979371758
+
+##======Compare result
+#import matplotlib.pyplot as plt
+#plt.scatter(y_test, y_pred)
+#plt.title('Actual vs Predicted (K15)');plt.xlabel('Actual');plt.ylabel('Predicted')
+#plt.ylim(0, 1)
 #
-#plt.subplot(122)
-#plt.hist(y_pred, bins=n_bins)
-#plt.xlabel('Value')
-#plt.title('Predicted')
+##======Compare result distribution
+#n_bins=20
+#fig, axs = plt.subplots(1, 2, sharey=True, sharex=False, tight_layout=True)
+## We can set the number of bins with the `bins` kwarg
+#axs[0].hist(y_test, bins=n_bins)
+#axs[0].set_ylabel('Frequency')
+#axs[0].set_title('K15-Actual')
+#axs[1].hist(y_pred, bins=n_bins)
+#axs[1].set_xlabel('Probability')
+#axs[1].set_title('K15-Predicted')
