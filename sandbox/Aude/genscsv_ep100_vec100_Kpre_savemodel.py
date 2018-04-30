@@ -22,6 +22,7 @@ import emot
 import gensim
 import matplotlib.pyplot as plt
 import numpy as np
+import datetime as dt
 
 # Show start time of this program
 print('start time : '+str(dt.datetime.now()) )
@@ -99,7 +100,7 @@ print( 'model trained' )
 
 
 #saving the created model
-model.save('doc2vec.model')
+model.save('ep100_vec100_Kpre_model.model')
 print( 'model saved' )
 
 # =============================================================================

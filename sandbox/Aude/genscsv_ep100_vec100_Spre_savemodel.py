@@ -125,7 +125,7 @@ print( 'model trained' )
 
 
 #saving the created model
-model.save('doc2vec.model')
+model.save('ep100_vec100_Spre_model.model')
 print( 'model saved' )
 
 # =============================================================================
