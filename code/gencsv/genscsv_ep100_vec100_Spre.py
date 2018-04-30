@@ -157,6 +157,7 @@ for nn in range(0,len(docvecs)):
 # Write csv file
 np.savetxt('gencsv_ep100_vec100_Spre.txt',num_data,fmt='%.8f',delimiter=',', comments='')
 
+
 print( 'saved txt file : ' + str(len(num_data)) + ' records')
 
 # Read numberical data into num_data

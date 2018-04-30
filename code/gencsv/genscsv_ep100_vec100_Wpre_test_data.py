@@ -27,12 +27,12 @@ import datetime as dt
 print('start time : '+str(dt.datetime.now()) )
 
  # Load a CSV	
-train_data = pd.read_csv(r'A:\sem2\data mining\group project\data\train.csv'
+train_data = pd.read_csv(r'C:\Users\audeb\Southampton Uni\Sem2\Data Mining\Group CW\GitHub\WeatherCasters\data\train.csv'
                          ,names = ["id", "tweets", "state", "location", "s1", "s2", "s3", "s4", "s5", "w1", "w2", "w3", "w4", "k1", "k2", "k3", "k4", "k5", "k6", "k7", "k8", "k9", "k10", "k11", "k12", "k13", "k14", "k15"]
                         ,header=0,sep=',',error_bad_lines=False,encoding='utf-8')
 
 
-test_data = pd.read_csv(r'A:\sem2\data mining\group project\data\test.csv'
+test_data = pd.read_csv(r'C:\Users\audeb\Southampton Uni\Sem2\Data Mining\Group CW\GitHub\WeatherCasters\data\test.csv'
                          , names = ["id", "tweets", "state", "location"]
                          , header=0, sep=',', error_bad_lines = False, encoding='utf-8')
 

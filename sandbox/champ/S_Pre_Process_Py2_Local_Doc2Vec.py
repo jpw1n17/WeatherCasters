@@ -30,8 +30,8 @@ import matplotlib.pyplot as plt
 #                         ,names = ["id", "tweets", "state", "location", "s1", "s2", "s3", "s4", "s5", "w1", "w2", "w3", "w4", "k1", "k2", "k3", "k4", "k5", "k6", "k7", "k8", "k9", "k10", "k11", "k12", "k13", "k14", "k15"]
 #                        ,header=0,sep=',',error_bad_lines=False,encoding='utf-8')
 
-file_path_1 = 'D:/Champ/AnacondaProjects/WeatherCasters/Local/data/train.csv'
-file_path_2 = 'D:/Champ/AnacondaProjects/WeatherCasters/Local/sandbox/champ/data/simple_01.csv'
+file_path_1 = 'C:/Users/audeb/Southampton Uni/Sem2/Data Mining/Group CW/GitHub/WeatherCasters/data/train.csv'
+file_path_2 = 'C:/Users/audeb/Southampton Uni/Sem2/Data Mining/Group CW/GitHub/WeatherCasters/sandbox/champ/data/simple_01.csv'
 
 train_data = pd.read_csv(file_path_1
                          ,names = ["id", "tweets", "state", "location", "s1", "s2", "s3", "s4", "s5", "w1", "w2", "w3", "w4", "k1", "k2", "k3", "k4", "k5", "k6", "k7", "k8", "k9", "k10", "k11", "k12", "k13", "k14", "k15"]

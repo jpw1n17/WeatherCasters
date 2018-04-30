@@ -12,15 +12,15 @@ from nltk import RegexpTokenizer
 from nltk.corpus import stopwords
 from os import listdir
 from os.path import isfile, join
+import pandas as pd
 
 train_data = []
 
-with open('../../data/train.csv',encoding="utf8") as file:
-    # Read File
-    reader = csv.reader(file)
-    train_data = [row for row in reader]
+train_data = pd.read_csv('../../data/train.csv'
+                         ,names = ["id", "tweets", "state", "location"]
+                        ,header=0,sep=',',error_bad_lines=False,encoding='utf-8')
 
-
+######### CONTINUE FROM HERE
 tokenizer = RegexpTokenizer(r'\w+')
 stopword_set = set(stopwords.words('english'))
 #This function does all cleaning of data using two objects above
@@ -43,7 +43,7 @@ class LabeledLineSentence(object):
               yield gensim.models.doc2vec.LabeledSentence(doc,    
 [self.labels_list[idx]])
 
-header = train_data[0]
+#header = train_data[0]
 
 train_data = train_data[1:len(train_data)] 
 
