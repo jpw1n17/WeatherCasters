@@ -97,19 +97,19 @@ ax.axhline(y=avg_result, color='r', linestyle='-')
 #RMSE gencsv_ep100_vec10_Kpre :0.12361350112844519
 #RMSE gencsv_ep100_vec100_Kpre:0.12316789696891321
 
-##======Compare result
-#import matplotlib.pyplot as plt
-#plt.scatter(y_test, y_pred)
-#plt.title('Actual vs Predicted (K15)');plt.xlabel('Actual');plt.ylabel('Predicted')
-#plt.ylim(0, 1)
-#
+#======Compare result
+import matplotlib.pyplot as plt
+plt.scatter(actual[23], predicted[23])
+plt.title('Actual vs Predicted (K15)');plt.xlabel('Actual');plt.ylabel('Predicted')
+plt.ylim(0, 1)
+
 ##======Compare result distribution
-#n_bins=20
-#fig, axs = plt.subplots(1, 2, sharey=True, sharex=False, tight_layout=True)
-## We can set the number of bins with the `bins` kwarg
-#axs[0].hist(y_test, bins=n_bins)
-#axs[0].set_ylabel('Frequency')
-#axs[0].set_title('K15-Actual')
-#axs[1].hist(y_pred, bins=n_bins)
-#axs[1].set_xlabel('Probability')
-#axs[1].set_title('K15-Predicted')
+n_bins=20
+fig, axs = plt.subplots(1, 2, sharey=True, sharex=False, tight_layout=True)
+# We can set the number of bins with the `bins` kwarg
+axs[0].hist(y_test, bins=n_bins)
+axs[0].set_ylabel('Frequency')
+axs[0].set_title('K15-Actual')
+axs[1].hist(y_pred, bins=n_bins)
+axs[1].set_xlabel('Probability')
+axs[1].set_title('K15-Predicted')
