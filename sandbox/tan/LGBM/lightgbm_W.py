@@ -12,60 +12,70 @@ outputlen = 24
 inputlen = datalen-outputlen
 
 X = dataset[dataset.columns[0:inputlen]].values
+X = dataset[dataset.columns[0:inputlen]].values
 
-# 's1'[1],'s2','s3','s4','s5','w1','w2','w3','w4'
-#,'k1'[10],'k2','k3','k4','k5','k6','k7','k8','k9','k10','k11','k12','k13','k14','k15']
+result = []
+for idx, i in enumerate(range(6,9)):
+    print("round: " + str(idx))
+    # s[1:5]: 's1','s2','s3','s4','s5'
+    # w[6:9]: 'w1','w2','w3','w4'
+    #,k[10:24]: 'k1','k2','k3','k4','k5','k6','k7','k8','k9','k10','k11','k12','k13','k14','k15']
+    # select output to predict. Ex. 10 = k1 , 24 = k15
+    selected_output = i #10 
+    y = dataset[dataset.columns[inputlen-1+selected_output]].values
+    
+    from sklearn.cross_validation import train_test_split
+    x_train, x_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 0)
+    ## Feature Scaling
+    #from sklearn.preprocessing import StandardScaler
+    #sc = StandardScaler()
+    #x_train = sc.fit_transform(x_train)
+    #x_test = sc.transform(x_test)
+    
+    #======Setup parameters
+    import lightgbm as lgb
+    d_train = lgb.Dataset(x_train, y_train.flatten())
+    #d_train = lgb.Dataset(x_train, y_train.flatten(),categorical_feature=list(range(10)))
+    params = {}
+    params['learning_rate'] = 0.02
+    params['boosting_type'] = 'gbdt'
+    params['objective'] = 'regression_l2'
+    params['metric'] = 'l2_root'
+    params['sub_feature'] = 0.5
+    params['num_leaves'] = 25
+    params['min_data'] = 50
+    params['max_depth'] = 10
+    params['is_unbalance'] = True
+    params['num_iterations'] = 1000
+    
+    
+    #======Training model
+    clf = lgb.train(params, d_train, 100)
+    
+    
+    #======Prediction
+    y_pred=clf.predict(x_test)
+    
+    
+    #======Evaluation
+    #RMSE
+    import math
+    from sklearn.metrics import mean_squared_error
+    rmse=math.sqrt(mean_squared_error(y_pred,y_test))
+    print("RMSE_"+ str(i) + ":" +str(rmse))
+    result.append(rmse)
 
-#select output to predict. Ex. 10 = k1 , 24 = k15
-selected_output = 10 
-y = dataset[dataset.columns[inputlen-1+selected_output]].values
+rmse_mean = np.mean(result);
+print("RMSE :"+ str(rmse_mean));
 
-from sklearn.cross_validation import train_test_split
-x_train, x_test, y_train, y_test = train_test_split(X, y, test_size = 0.25, random_state = 0)
-## Feature Scaling
-#from sklearn.preprocessing import StandardScaler
-#sc = StandardScaler()
-#x_train = sc.fit_transform(x_train)
-#x_test = sc.transform(x_test)
-
-#======Setup parameters
-import lightgbm as lgb
-d_train = lgb.Dataset(x_train, y_train.flatten())
-#d_train = lgb.Dataset(x_train, y_train.flatten(),categorical_feature=list(range(10)))
-params = {}
-params['learning_rate'] = 0.003
-params['boosting_type'] = 'gbdt'
-params['objective'] = 'regression_l2'
-#params['objective'] = 'binary'
-params['metric'] = 'l2_root'
-#params['metric'] = 'binary_logloss'
-params['sub_feature'] = 0.5
-params['num_leaves'] = 30
-params['min_data'] = 50
-params['max_depth'] = 10
-params['is_unbalance'] = True
-
-
-#======Training model
-clf = lgb.train(params, d_train, 100)
-
-#======Prediction
-y_pred=clf.predict(x_test)
-
-#======Evaluation
-#RMSE
-import math
-from sklearn.metrics import mean_squared_error
-rmse=math.sqrt(mean_squared_error(y_pred,y_test))
-print("RMSE:"+str(rmse))
-
-#RMSE gencsv_ep100_vec100_Wpre:0.12339076753594953
+#RMSE gencsv_ep100_vec100_Wpre:0.2653909955406634
 
 #======Compare result
 import matplotlib.pyplot as plt
 plt.scatter(y_test, y_pred)
-plt.title('Actual vs Predicted');plt.xlabel('Actual');plt.ylabel('Predicted')
+plt.title('Actual vs Predicted for W_Vector');plt.xlabel('Actual');plt.ylabel('Predicted')
 plt.ylim(0, 1)
+
 
 #======Compare result distribution
 n_bins=100
