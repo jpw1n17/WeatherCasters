@@ -44,14 +44,14 @@ for idx, i in enumerate(range(1,25)):
     d_train = lgb.Dataset(x_train, y_train.flatten())
     #d_train = lgb.Dataset(x_train, y_train.flatten(),categorical_feature=list(range(10)))
     params = {}
-    params['learning_rate'] = 0.02
+    params['learning_rate'] = 0.03
     params['boosting_type'] = 'gbdt'
     params['objective'] = 'regression_l2'
     #params['objective'] = 'binary'
     params['metric'] = 'l2_root'
     #params['metric'] = 'binary_logloss'
     params['sub_feature'] = 0.5
-    params['num_leaves'] = 25
+    params['num_leaves'] = 32
     params['min_data'] = 50
     params['max_depth'] = 10
     params['is_unbalance'] = True
@@ -95,7 +95,7 @@ ax.bar(x, result)
 ax.axhline(y=avg_result, color='r', linestyle='-')
 
 #RMSE gencsv_ep100_vec10_Kpre :0.12361350112844519
-#RMSE gencsv_ep100_vec100_Kpre:0.12316789696891321
+#RMSE gencsv_ep100_vec100_Kpre:0.11324742125297897
 
 #======Compare result
 import matplotlib.pyplot as plt
