@@ -76,8 +76,8 @@ for idx, i in enumerate(range(1,25)):
 
 # sample usage
 save_object(model, 'all_model_trained_by_k-data.pkl')
-save_object(actual, 'actual_by_k-data.pkl')
-save_object(predicted, 'predicted_by_k-data.pkl')
+#save_object(actual, 'actual_by_k-data.pkl')
+#save_object(predicted, 'predicted_by_k-data.pkl')
 
 print(result)
 avg_result = numpy.mean(result)
@@ -107,9 +107,22 @@ plt.ylim(0, 1)
 n_bins=20
 fig, axs = plt.subplots(1, 2, sharey=True, sharex=False, tight_layout=True)
 # We can set the number of bins with the `bins` kwarg
-axs[0].hist(y_test, bins=n_bins)
+axs[0].hist(actual[23], bins=n_bins)
 axs[0].set_ylabel('Frequency')
 axs[0].set_title('K15-Actual')
-axs[1].hist(y_pred, bins=n_bins)
+axs[1].hist(predicted[23], bins=n_bins)
 axs[1].set_xlabel('Probability')
 axs[1].set_title('K15-Predicted')
+
+
+
+##******************======Compare result distribution
+n_bins=20
+fig, axs = plt.subplots(1, 2, sharey=True, sharex=False, tight_layout=True)
+# We can set the number of bins with the `bins` kwarg
+axs[0].hist(y_train, bins=n_bins)
+axs[0].set_ylabel('Frequency')
+axs[0].set_title('train data')
+axs[1].hist(y_test, bins=n_bins)
+axs[1].set_xlabel('Probability')
+axs[1].set_title('test data')
