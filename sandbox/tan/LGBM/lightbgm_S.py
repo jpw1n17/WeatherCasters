@@ -34,7 +34,6 @@ for idx, i in enumerate(range(1,25)):
     selected_output = i #10 
     y = dataset[dataset.columns[inputlen-1+selected_output]].values
     
-    from sklearn.cross_validation import train_test_split
     x_train, x_test, y_train, y_test = train_test_split(X, y, test_size = 0.20, random_state = 0)
     ## Feature Scaling
     #from sklearn.preprocessing import StandardScaler
@@ -43,7 +42,6 @@ for idx, i in enumerate(range(1,25)):
     #x_test = sc.transform(x_test)
     
     #======Setup parameters
-    import lightgbm as lgb
     d_train = lgb.Dataset(x_train, y_train.flatten())
     #d_train = lgb.Dataset(x_train, y_train.flatten(),categorical_feature=list(range(10)))
     params = {}
@@ -99,7 +97,6 @@ ax.axhline(y=avg_result, color='r', linestyle='-')
 #RMSE gencsv_ep100_vec10_Spre :0.20465187910079985
 
 ##======Compare result
-#import matplotlib.pyplot as plt
 #plt.scatter(y_test, y_pred)
 #plt.title('Actual vs Predicted (S)');plt.xlabel('Actual');plt.ylabel('Predicted')
 #plt.ylim(0, 1)
