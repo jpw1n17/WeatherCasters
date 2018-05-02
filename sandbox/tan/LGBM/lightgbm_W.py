@@ -34,7 +34,6 @@ for idx, i in enumerate(range(1,25)):
     selected_output = i #10 
     y = dataset[dataset.columns[inputlen-1+selected_output]].values
     
-    from sklearn.cross_validation import train_test_split
     x_train, x_test, y_train, y_test = train_test_split(X, y, test_size = 0.20, random_state = 0)
     ## Feature Scaling
     #from sklearn.preprocessing import StandardScaler
@@ -43,7 +42,6 @@ for idx, i in enumerate(range(1,25)):
     #x_test = sc.transform(x_test)
     
     #======Setup parameters
-    import lightgbm as lgb
     d_train = lgb.Dataset(x_train, y_train.flatten())
     #d_train = lgb.Dataset(x_train, y_train.flatten(),categorical_feature=list(range(10)))
     params = {}
@@ -61,7 +59,7 @@ for idx, i in enumerate(range(1,25)):
     
     #======Training model
     clf = lgb.train(params, d_train, 100)
-    
+    model.append(clf)
     
     #======Prediction
     y_pred=clf.predict(x_test)
@@ -98,12 +96,9 @@ ax.set_ylabel('RMSE')
 ax.bar(x, result)
 ax.axhline(y=avg_result, color='r', linestyle='-')
 
-#RMSE gencsv_ep100_vec100_Wpre:0.3096713979371758
-
 ##======Compare result
-#import matplotlib.pyplot as plt
 #plt.scatter(y_test, y_pred)
-#plt.title('Actual vs Predicted (K15)');plt.xlabel('Actual');plt.ylabel('Predicted')
+#plt.title('Actual vs Predicted (W)');plt.xlabel('Actual');plt.ylabel('Predicted')
 #plt.ylim(0, 1)
 #
 ##======Compare result distribution
@@ -112,7 +107,7 @@ ax.axhline(y=avg_result, color='r', linestyle='-')
 ## We can set the number of bins with the `bins` kwarg
 #axs[0].hist(y_test, bins=n_bins)
 #axs[0].set_ylabel('Frequency')
-#axs[0].set_title('K15-Actual')
+#axs[0].set_title('W-Actual')
 #axs[1].hist(y_pred, bins=n_bins)
 #axs[1].set_xlabel('Probability')
-#axs[1].set_title('K15-Predicted')
+#axs[1].set_title('W-Predicted')
