@@ -61,7 +61,7 @@ for idx, i in enumerate(range(1,25)):
     
     #======Training model
     clf = lgb.train(params, d_train, 100)
-    
+    model.append(clf)
     
     #======Prediction
     y_pred=clf.predict(x_test)
@@ -96,13 +96,12 @@ ax.set_ylabel('RMSE')
 ax.bar(x, result)
 ax.axhline(y=avg_result, color='r', linestyle='-')
 
-#RMSE gencsv_ep100_vec10_Kpre :0.12361350112844519
-#RMSE gencsv_ep100_vec100_Kpre:0.12316789696891321
+#RMSE gencsv_ep100_vec10_Spre :0.20465187910079985
 
 ##======Compare result
 #import matplotlib.pyplot as plt
 #plt.scatter(y_test, y_pred)
-#plt.title('Actual vs Predicted (K15)');plt.xlabel('Actual');plt.ylabel('Predicted')
+#plt.title('Actual vs Predicted (S)');plt.xlabel('Actual');plt.ylabel('Predicted')
 #plt.ylim(0, 1)
 #
 ##======Compare result distribution
@@ -111,7 +110,7 @@ ax.axhline(y=avg_result, color='r', linestyle='-')
 ## We can set the number of bins with the `bins` kwarg
 #axs[0].hist(y_test, bins=n_bins)
 #axs[0].set_ylabel('Frequency')
-#axs[0].set_title('K15-Actual')
+#axs[0].set_title('S-Actual')
 #axs[1].hist(y_pred, bins=n_bins)
 #axs[1].set_xlabel('Probability')
-#axs[1].set_title('K15-Predicted')
+#axs[1].set_title('S-Predicted')
