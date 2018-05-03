@@ -7,7 +7,8 @@ from math import sqrt
 import pandas as pd
 import os
 
-os.chdir('D:\Learning\Semester 2\DM\CW 1')
+#os.chdir('D:\Learning\Semester 2\DM\CW 1')
+os.chdir('D:\Champ\AnacondaProjects\WeatherCasters\Local\sandbox\champ')
 
 # =============================================================================
 # read data from csv
@@ -181,23 +182,59 @@ for gamma in alphas:
     rms_errs_all.append(rms_folds)
     alphas_all.append(gamma)
 
-    # Count number of non-zero coefficient
-    for i in range(num_folds):
-        onefold_model = np.append(kfolds_model_S[i], kfolds_model_W[i], axis=1)
-        onefold_model = np.append(onefold_model, kfolds_model_K[i], axis=1)
-        
-        
-
-
 ## =============================================================================
-## plot graph    
+## plot graph 1    
 ## =============================================================================
         
 box = plt.boxplot(rms_errs_all, labels = alphas_all)        
-        
+
+## =============================================================================
+## plot graph 2    
+## =============================================================================
+
+# create a list of the benchmark value to plot line graph        
+benchmark_val = 0.31957
+baseval_lst = [benchmark_val for i in range(len(alphas_all))]
+
+
+# plot figure
+plt.figure(2)
+fig, ax = plt.subplots(figsize=(10, 6))
+
+bp = ax.boxplot(rms_errs_all, labels = alphas_all, 
+                #positions = alphas_all,
+                  notch=0, vert=1, whis=1.5)
+
+#ax.set_xlim(0, max(alphas_all)+1)
+#ax.set_xticks(alphas_all)
+ax.set_xticklabels(alphas_all) 
+
+plt.setp(bp['boxes'], color='blue')
+plt.setp(bp['whiskers'], color='black')
+plt.setp(bp['fliers'], color='black', marker='.')
+plt.setp(bp['medians'], color='orange')
+
+# plot the benchmark value line graph
+#lngrp = plt.plot(alphas_all, baseval_lst , 'b-o', label='base-line') 
+
+
+# Add a horizontal grid to the plot, but make it very light in color
+# so we can use it for reading data values but not be distracting
+ax.yaxis.grid(True, linestyle='-', which='major', color='lightgrey',
+               alpha=0.5)
+
+# Hide these grid behind plot objects
+ax.set_axisbelow(True)
+ax.set_title('Sparse Regression RMSE over gamma')
+ax.set_xlabel('Gamma')
+ax.set_ylabel('RMSE')
+
+plt.legend()
+plt.show()
+
 
 # =============================================================================
-# Previou main program
+# Previous main program
 # =============================================================================
 
 
