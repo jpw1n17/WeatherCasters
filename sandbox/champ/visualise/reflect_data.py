@@ -358,7 +358,7 @@ ax.xaxis.grid(True, linestyle='-', which='major', color='lightgrey',
                alpha=0.5)
 
 ax.set_axisbelow(True)
-
+ax.set_title('2D Visualisation Coloured by Actual Output Value')
 plt.show()
 
 
