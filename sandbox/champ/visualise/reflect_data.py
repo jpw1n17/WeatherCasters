@@ -145,10 +145,14 @@ n_pt = n_point - 1
 
 t = np.arange(0, 1, 0.1)
 
-plt.figure(1)
-plt.scatter(yts.loc[tr_nrows:tr_nrows+n_pt,123], yhts.loc[0:n_pt,23])
-plt.plot(t, t, color='green')
-plt.show()
+## =============================================================================
+## Plot a simple graph
+## =============================================================================
+
+#plt.figure(1)
+#plt.scatter(yts.loc[tr_nrows:tr_nrows+n_pt,123], yhts.loc[0:n_pt,23])
+#plt.plot(t, t, color='green')
+#plt.show()
 
 # =============================================================================
 # Visualize data-points in colour
@@ -295,10 +299,10 @@ similarities = 1 - cosine_similarity(docvec_data)
 # Multidimensional Scaling for Doc2Vec data
 seed = np.random.RandomState(seed=3)
 
-#mds = manifold.MDS(n_components=2, max_iter=100, eps=1e-9, random_state=seed,
-#                   dissimilarity="precomputed", n_jobs=1)
+mds = manifold.MDS(n_components=2, max_iter=1, eps=1e-9, random_state=seed,
+                   dissimilarity="precomputed", n_jobs=1)
 
-#pos = mds.fit(similarities).embedding_
+pos = mds.fit(similarities).embedding_
 
 # Rotate the data
 clf = PCA(n_components=2)
@@ -307,13 +311,19 @@ pca_docvecs = clf.fit_transform(docvec_data)
 #pca_pos = clf.fit_transform(pos)
 
 # transfrom to DataFrame
-pca_dv_df = pd.DataFrame(pca_docvecs)
+dv_df = pd.DataFrame(pca_docvecs)
+pos_df = pd.DataFrame(pos)
+
+pltvec_df = dv_df
 
 
+# =============================================================================
+# plot graph
+# =============================================================================
 
 plt.figure(4)
 fig, ax = plt.subplots(figsize=(10, 6))
-plt.scatter( pca_dv_df.loc[:,0] ,pca_dv_df.loc[:,1]
+plt.scatter( pltvec_df.loc[:,0] ,pltvec_df.loc[:,1]
             , c=colors, alpha=0.5)
 
 # add a grid which has grey color
@@ -331,12 +341,12 @@ plt.show()
 # =============================================================================
 
 # Create data frame that has the result 
-df = pd.DataFrame(dict(x=pca_dv_df.loc[:,0], y=pca_dv_df.loc[:,1], label=indx_lst)) 
+df = pd.DataFrame(dict(x=pltvec_df.loc[:,0], y=pltvec_df.loc[:,1], label=indx_lst)) 
 # Group by cluster
 groups = df.groupby('label')
 
 # =============================================================================
-# Visualise in 2D scatter plot
+# Visualise PCA vectors in 2D scatter plot
 # =============================================================================
 
 plt.figure(5)
@@ -362,13 +372,41 @@ ax.set_title('2D Visualisation Coloured by Actual Output Value')
 plt.show()
 
 
+# =============================================================================
+# grouping MDS vector by the colour
+# =============================================================================
+pltvec_df = pos_df
+
+# Create data frame that has the result 
+df = pd.DataFrame(dict(x=pltvec_df.loc[:,0], y=pltvec_df.loc[:,1], label=indx_lst)) 
+# Group by cluster
+groups = df.groupby('label')
 
 # =============================================================================
-# 
+# Visualise vectors using MDS in 2D scatter plot
 # =============================================================================
 
+plt.figure(6)
+fig, ax = plt.subplots(figsize=(10, 6))
+for indx, group in groups:
+    ax.plot( group.x, group.y
+            , marker='o', linestyle='',ms=4 
+            , color=col_opt_val[indx]
+            , label=opt_rng[indx]
+            )
+    
+# add legend    
+plt.legend(scatterpoints=1, loc='best', shadow=False)
 
+# add a grid which has grey color
+ax.yaxis.grid(True, linestyle='-', which='major', color='lightgrey',
+               alpha=0.5)
+ax.xaxis.grid(True, linestyle='-', which='major', color='lightgrey',
+               alpha=0.5)
 
+ax.set_axisbelow(True)
+ax.set_title('2D Visualisation Coloured by Actual Output Value')
+plt.show()
 
 
 # =============================================================================
