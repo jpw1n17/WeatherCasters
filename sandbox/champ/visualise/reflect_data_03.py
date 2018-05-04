@@ -173,13 +173,31 @@ plt.show()
 # color by output value
 colors = []
 for i in range(n_point):
-    # actual output value
-    #val = yts.loc[tr_nrows+i,123]
+    ### actual output value
+    val = yts.loc[tr_nrows+i,123]
     
-    # predicted output value
-    val = yhts.loc[i,23]
-    colors.append(val)
+    ### predicted output value
+    #val = yhts.loc[i,23]
     
+    #cl_val =  val
+    
+    thrh_val = [0.1,0.3,0.5,0.7,0.9]
+    if val >= 0 and val < float(thrh_val[0]):
+        cl_val = "red"
+    elif val >= float(thrh_val[0]) and val < float(thrh_val[1]):
+        cl_val = "orange"
+    elif val >= float(thrh_val[1]) and val < float(thrh_val[2]):
+        cl_val = "yellow"
+    elif val >= float(thrh_val[2]) and val < float(thrh_val[3]):
+        cl_val = "green"
+    elif val >= float(thrh_val[3]) and val < float(thrh_val[4]):
+        cl_val = "blue"
+    elif val >= float(thrh_val[4]) and val <= 1:
+        cl_val = "purple"
+    else:
+        cl_val = "black"
+    
+    colors.append(cl_val)
 colors = np.asarray(colors)
 # =============================================================================
 
