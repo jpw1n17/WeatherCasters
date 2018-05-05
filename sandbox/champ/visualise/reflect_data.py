@@ -169,8 +169,9 @@ def create_lgbm_model(x_train, y_train):
 # =============================================================================
 
 # Fixing random state for reproducibility
-np.random.seed(123)
+np.random.seed(148)
 
+# number of columns for the output data
 n_output = 24
 
 num_data = read_train_Spre_data()
@@ -191,7 +192,7 @@ tr_nrows = round(all_nrows*tr_percent) - 1
 test_nrows = all_nrows - tr_nrows 
 
 # set number of points to be visualized in the graph 
-n_point = 400
+n_point = test_nrows
 n_pt = n_point - 1
 
 # =============================================================================
@@ -201,6 +202,10 @@ n_pt = n_point - 1
 #xtr,ytr,xts,yts = split_train_test(x,y,tr_nrows)
 #xtr,ytr,xts,yts = split_train_testcut(x,y,tr_nrows,n_point)
 xtr,ytr,xts,yts = split_train_testcutrand(x,y,tr_nrows,n_point)
+
+
+# select 1 output from the 24 outputs
+slt_output_col = 3   # selected output column
 
 ## =============================================================================
 
@@ -216,12 +221,12 @@ xtr,ytr,xts,yts = split_train_testcutrand(x,y,tr_nrows,n_point)
 # transform the result to DataFrame
 #yhts = pd.DataFrame(yhts)
 #
-#yhts_sel = yhts.loc[0:n_pt,23]
+#yhts_sel = yhts.iloc[0:n_pt,slt_output_col]
 
 ## =============================================================================
 
 # selected output column to train the model
-ytr_sel = ytr.loc[:,123]
+ytr_sel = ytr.iloc[:,slt_output_col]
 
 # create and train the LightGBM model
 clf = create_lgbm_model(xtr,ytr_sel)
@@ -230,7 +235,7 @@ clf = create_lgbm_model(xtr,ytr_sel)
 yhts_sel = clf.predict(xts)
 
 #======Actual output
-yts_sel = yts.iloc[:,23]
+yts_sel = yts.iloc[:,slt_output_col]
 
 # transform the result to DataFrame
 yhts_sel = pd.DataFrame(yhts_sel)
@@ -288,7 +293,7 @@ plt.show()
 
 ###   y.loc[:,123] 
 ###   This means allo rows of the column 123 (124th column)
-###     in the DataFrame y.
+###     in the DataFrame y refer by the label of the column
 
 # =============================================================================
 # Color code
