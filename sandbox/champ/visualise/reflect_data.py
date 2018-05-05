@@ -83,9 +83,43 @@ def split_train_test(x,y,tr_nrows):
     ytr = y[0:tr_nrows]
     xtr = x[0:tr_nrows]
 
-    # get the test set
+    # get all of the test set
     yts = y[tr_nrows:all_nrows]
     xts = x[tr_nrows:all_nrows] 
+    
+    return xtr,ytr,xts,yts
+
+## =============================================================================
+## put data into variables Part 2
+## =============================================================================
+    
+# select only some part of testset
+def split_train_testcut(x,y,tr_nrows,n_point):
+    
+    # get the train set
+    ytr = y[0:tr_nrows]
+    xtr = x[0:tr_nrows]
+
+    # get some of the test set
+    yts = y[tr_nrows:tr_nrows+n_point]
+    xts = x[tr_nrows:tr_nrows+n_point] 
+    
+    return xtr,ytr,xts,yts
+
+
+# select only some part of testset
+def split_train_testcutrand(x,y,tr_nrows,n_point):
+        
+    rnd_num = np.random.randint(tr_nrows,all_nrows,n_point)
+    rnd_num = np.ndarray.tolist(rnd_num)
+    
+    # get the train set
+    ytr = y[0:tr_nrows]
+    xtr = x[0:tr_nrows]
+
+    # get some of the test set
+    yts = y.loc[rnd_num]
+    xts = x.loc[rnd_num]
     
     return xtr,ytr,xts,yts
 
@@ -134,6 +168,9 @@ def create_lgbm_model(x_train, y_train):
 # Main Program
 # =============================================================================
 
+# Fixing random state for reproducibility
+np.random.seed(123)
+
 n_output = 24
 
 num_data = read_train_Spre_data()
@@ -150,8 +187,20 @@ all_nrows = len(x)
 tr_percent = 0.9
 tr_nrows = round(all_nrows*tr_percent) - 1
     
+# set number rows for the rest of the dataset
+test_nrows = all_nrows - tr_nrows 
 
-xtr,ytr,xts,yts = split_train_test(x,y,tr_nrows)
+# set number of points to be visualized in the graph 
+n_point = 400
+n_pt = n_point - 1
+
+# =============================================================================
+# # split the data into training set and test set 
+# =============================================================================
+
+#xtr,ytr,xts,yts = split_train_test(x,y,tr_nrows)
+#xtr,ytr,xts,yts = split_train_testcut(x,y,tr_nrows,n_point)
+xtr,ytr,xts,yts = split_train_testcutrand(x,y,tr_nrows,n_point)
 
 ## =============================================================================
 
@@ -180,11 +229,14 @@ clf = create_lgbm_model(xtr,ytr_sel)
 #======Prediction
 yhts_sel = clf.predict(xts)
 
+#======Actual output
+yts_sel = yts.iloc[:,23]
+
 # transform the result to DataFrame
 yhts_sel = pd.DataFrame(yhts_sel)
 
 ## =============================================================================
-## Plot graph
+## Setting to plot graph
 ## =============================================================================
 # bigger font size
 font = {'family' : 'normal',
@@ -193,12 +245,6 @@ font = {'family' : 'normal',
 
 plt.rc('font', **font)
 
-
-# set number of points in the graph 
-#n_point = 1000 
-n_point = all_nrows - tr_nrows 
-n_pt = n_point - 1
-
 ttt = np.arange(0, 1.2, 0.1)
 
 ## =============================================================================
@@ -206,7 +252,7 @@ ttt = np.arange(0, 1.2, 0.1)
 ## =============================================================================
 
 #plt.figure(1)
-#plt.scatter(yts.loc[tr_nrows:tr_nrows+n_pt,123], yhts_sel)
+#plt.scatter(yts_sel, yhts_sel)
 #plt.plot(ttt, ttt, color='green')
 #plt.show()
 
@@ -218,7 +264,7 @@ colors = np.random.rand(n_point)
 
 plt.figure(2)
 fig, ax = plt.subplots(figsize=(10, 6))
-plt.scatter(yts.loc[tr_nrows:tr_nrows+n_pt,123], yhts_sel
+plt.scatter(yts_sel, yhts_sel
             , c=colors, alpha=0.5)
 plt.plot(ttt, ttt, color='green')
 
@@ -316,10 +362,10 @@ thrh_val = [0.1,0.3,0.5,0.7,0.9]
 for i in range(n_point):
     
     ### actual output value
-    val_at = yts.loc[tr_nrows+i,123]
+    val_at = float(yts_sel.iloc[i])
     
     ### predicted output value
-    val_pd = float(yhts_sel.loc[i,:])
+    val_pd = float(yhts_sel.iloc[i])
     
     #cl_val =  val_at  # simple style
     
@@ -342,7 +388,7 @@ colors_pd = np.asarray(colors_pd)
 
 plt.figure(3)
 fig, ax = plt.subplots(figsize=(10, 6))
-plt.scatter(yts.loc[tr_nrows:tr_nrows+n_pt,123], yhts_sel
+plt.scatter(yts_sel, yhts_sel
             , c=colors, alpha=0.5)
 plt.plot(ttt, ttt, color='green')
 
@@ -371,6 +417,7 @@ vecdata = xts
 docvec_data = vecdata - vecdata.mean()
 
 similarities = 1 - cosine_similarity(docvec_data)
+#similarities = euclidean_distances(docvec_data)
 
 # Multidimensional Scaling for Doc2Vec data
 seed = np.random.RandomState(seed=3)
@@ -431,12 +478,13 @@ groups = df.groupby('label')
 # =============================================================================
 # Visualise PCA vectors in 2D scatter plot
 # =============================================================================
+marker_size = 7
 
 plt.figure(5)
 fig, ax = plt.subplots(figsize=(10, 6))
 for indx, group in groups:
     ax.plot( group.x, group.y
-            , marker='o', linestyle='',ms=4 
+            , marker='o', linestyle='',ms=marker_size 
             , color=col_opt_val[indx]
             , label=opt_rng[indx]
             )
@@ -473,7 +521,7 @@ plt.figure(6)
 fig, ax = plt.subplots(figsize=(10, 6))
 for indx, group in groups:
     ax.plot( group.x, group.y
-            , marker='o', linestyle='',ms=4 
+            , marker='o', linestyle='',ms=marker_size 
             , color=col_opt_val[indx]
             , label=opt_rng[indx]
             )
@@ -509,7 +557,7 @@ plt.figure(7)
 fig, ax = plt.subplots(figsize=(10, 6))
 for indx, group in groups:
     ax.plot( group.x, group.y
-            , marker='o', linestyle='',ms=4 
+            , marker='o', linestyle='',ms=marker_size 
             , color=col_opt_val[indx]
             , label=opt_rng[indx]
             )
@@ -546,7 +594,7 @@ plt.figure(8)
 fig, ax = plt.subplots(figsize=(10, 6))
 for indx, group in groups:
     ax.plot( group.x, group.y
-            , marker='o', linestyle='',ms=4 
+            , marker='o', linestyle='',ms=marker_size 
             , color=col_opt_val[indx]
             , label=opt_rng[indx]
             )
