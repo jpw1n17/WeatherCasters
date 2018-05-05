@@ -199,7 +199,7 @@ plt.rc('font', **font)
 n_point = all_nrows - tr_nrows 
 n_pt = n_point - 1
 
-ttt = np.arange(0, 1.5, 0.1)
+ttt = np.arange(0, 1.2, 0.1)
 
 ## =============================================================================
 ## Plot a simple graph
@@ -248,51 +248,51 @@ plt.show()
 # Color code
 # =============================================================================
 
+#Grey = "#AEB6BF"
 #Red = "#E74C3C"
 #Orange = "#EB984E"
 #Yellow = "#F4D03F"
 #Green = "#2ECC71"
 #Blue = "#5DADE2"
 #Purple = "#A569BD"
-#Grey = "#AEB6BF"
 #Black = "#17202A"
 
-col_opt_val = ["#E74C3C","#EB984E","#F4D03F","#2ECC71",
-               "#5DADE2","#A569BD","#AEB6BF","#17202A"]
+col_opt_val = ["#AEB6BF","#E74C3C","#EB984E","#F4D03F",
+               "#2ECC71","#5DADE2","#A569BD","#17202A"]
 
-opt_rng = ["0 - 0.1",">0.1 - 0.3",">0.3 - 0.5",">0.5 - 0.7"
-               ,">0.7 - 0.9",">0.9 - 1",">1", "0<"]
+opt_rng = ["0<","0 - 0.1",">0.1 - 0.3",">0.3 - 0.5",
+           ">0.5 - 0.7",">0.7 - 0.9",">0.9 - 1",">1"]
 
 
 def get_color(val,thrh_val):
     
-    if val >= 0 and val < float(thrh_val[0]):
-        cl_val = "red"
+    if val < 0:
+        cl_val = "grey"
         grp_indx = 0
+        
+    elif val >= 0 and val < float(thrh_val[0]):
+        cl_val = "red"
+        grp_indx = 1
         
     elif val >= float(thrh_val[0]) and val < float(thrh_val[1]):
         cl_val = "orange"
-        grp_indx = 1
+        grp_indx = 2
         
     elif val >= float(thrh_val[1]) and val < float(thrh_val[2]):
         cl_val = "yellow"
-        grp_indx = 2
+        grp_indx = 3
         
     elif val >= float(thrh_val[2]) and val < float(thrh_val[3]):
         cl_val = "green"
-        grp_indx = 3
+        grp_indx = 4
         
     elif val >= float(thrh_val[3]) and val < float(thrh_val[4]):
         cl_val = "blue"
-        grp_indx = 4
+        grp_indx = 5
         
     elif val >= float(thrh_val[4]) and val <= 1:
         cl_val = "purple"
-        grp_indx = 5
-        
-    elif val > 1:
-        cl_val = "grey"
-        grp_indx = 6
+        grp_indx = 6        
         
     else:
         cl_val = "black"
