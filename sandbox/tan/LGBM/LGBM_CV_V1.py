@@ -20,57 +20,7 @@ def load_object(path):
     with open(path, 'rb') as input:
         obj = pickle.load(input)
     return obj   
-def genS4_error():
-    from sklearn.cross_validation import train_test_split
-    X = x_S
-    y = y_S[:,3]
-    x_train, x_test, y_train, y_test = train_test_split(X, y, test_size = 0.20, random_state = 0)
-    
-    #======Setup parameters
-    d_train = lgb.Dataset(x_train, y_train.flatten())
-    
-    params = {}
-    params['learning_rate'] = 0.07
-    params['boosting_type'] = 'gbdt'
-    params['objective'] = 'regression_l2'
-    params['metric'] = 'l2_root'
-    params['sub_feature'] = 0.5
-    params['num_leaves'] = 120
-    params['min_data'] = 50
-    params['max_depth'] = 10
-    params['is_unbalance'] = True
-    params['num_iterations'] = 1000
-    params['reg_lambda'] = 0.02
-    
-    
-    #======Training model
-    clf = lgb.train(params, d_train, 100)
-    
-    #======Prediction
-    y_pred=clf.predict(x_test)
-    y_test.shape
-    y_pred.shape
-    error = abs(y_pred - y_test)
-    error
-    
-    yall_pred = clf.predict(X)
-    yall_pred.shape
-    y.shape
-    error = abs(yall_pred - y)
-    max_error = max(error)
-    max_error 
-    list(error).index(max(error))
-    
-    
-    output = pd.DataFrame()
-    output['s4_error'] = error
-    hdr ="s4_abs_error"
-    #output_format = '%d'
-    
-    output_format = '%.8f'
-    
-    np.savetxt('s4_abs_error.csv',output,fmt=output_format,delimiter=',',comments='',header=hdr)
-    ##
+##
       
 # =============================================================================
 # read data from csv
@@ -291,8 +241,58 @@ params5['reg_lambda'] = 0.02
 
 params_list = [params1,params2,params3,params4,params5]
 
-##test
-#genS4_error()
+##Generate s4error
+from sklearn.cross_validation import train_test_split
+X = x_S
+y = y_S[:,3]
+x_train, x_test, y_train, y_test = train_test_split(X, y, test_size = 0.20, random_state = 0)
+
+#======Setup parameters
+d_train = lgb.Dataset(x_train, y_train.flatten())
+
+params = {}
+params['learning_rate'] = 0.07
+params['boosting_type'] = 'gbdt'
+params['objective'] = 'regression_l2'
+params['metric'] = 'l2_root'
+params['sub_feature'] = 0.5
+params['num_leaves'] = 120
+params['min_data'] = 50
+params['max_depth'] = 10
+params['is_unbalance'] = True
+params['num_iterations'] = 1000
+params['reg_lambda'] = 0.02
+
+
+#======Training model
+clf = lgb.train(params, d_train, 100)
+
+#======Prediction
+y_pred=clf.predict(x_test)
+y_test.shape
+y_pred.shape
+error = abs(y_pred - y_test)
+error
+
+yall_pred = clf.predict(X)
+yall_pred.shape
+y.shape
+error = abs(yall_pred - y)
+max_error = max(error)
+max_error 
+list(error).index(max(error))
+
+
+output = pd.DataFrame()
+output['s4_error'] = error
+output['s4_pred'] = yall_pred
+hdr ="s4_abs_error,s4_predicted"
+#output_format = '%d'
+
+output_format = '%.8f,%.8f'
+
+np.savetxt('s4_abs_error.csv',output,fmt=output_format,delimiter=',',comments='',header=hdr)
+####
 
 
 ## =============================================================================
