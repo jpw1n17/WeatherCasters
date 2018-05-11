@@ -1,5 +1,3 @@
-
-
 from sklearn.linear_model import Ridge
 import numpy as np
 import matplotlib.pyplot as plt
@@ -36,7 +34,7 @@ model_w = load_object('all_model_trained_by_W-data.pkl')
 model_k = load_object('all_model_trained_by_K-data.pkl')
 
 #get id for output
-test_orig = pd.read_csv('test.csv'  ,sep=',',error_bad_lines=False,encoding='utf-8')
+test_orig = pd.read_csv('../../../data/test.csv'  ,sep=',',error_bad_lines=False,encoding='utf-8')
 test_row_id = test_orig["id"].astype(int)
 
 #create output as dataframe
@@ -51,7 +49,7 @@ for i in range(24):
         model = model_w
         test_data = test_data_w
     else :
-        model = model_k
+        model = model_s
         test_data = test_data_k
         
     result = model[i].predict(test_data)
@@ -64,7 +62,7 @@ output_format = '%d'
 for i in range(24):
     output_format = output_format + ',%.8f'
 
-np.savetxt('lgbm_gencsv_ep100_vec100_Spre_predict.csv',output,fmt=output_format,delimiter=',',comments='',header=hdr)
+np.savetxt('lgbm_gencsv_nl_180_lr_007_Pre_S_predict.csv',output,fmt=output_format,delimiter=',',comments='',header=hdr)
 
 
 

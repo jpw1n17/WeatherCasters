@@ -29,11 +29,13 @@ avg_rms
     
 avg_result = np.mean(avg_rms)
 plt.figure(2)
+plt.axis([0, 24, 0, 8])
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.set_title('RMSE from Light GBM')
 ax.set_xlabel('output index')
 #ax.set_xticks(x)
 ax.set_ylabel('RMSE')
+ax.set_ylim([0,0.8])
 ax.bar(list(range(1,25)),avg_rms)
 #fig.show()
 ticks = plt.xticks(np.arange(25), ['']+ list(range(1,25)))

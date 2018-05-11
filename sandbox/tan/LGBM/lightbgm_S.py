@@ -13,7 +13,7 @@ def save_object(obj, filename):
         pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
 
 #====== Prepare data
-dataset = pd.read_csv('../../../code/gencsv/gencsv_ep100_vec100_Spre/gencsv_ep100_vec100_Spre.txt', sep = '\t', header = None)
+dataset = pd.read_csv('../../../code/gencsv/gencsv_ep100_vec100_Spre.csv', sep = ',', header = None)
 datalen = dataset.shape[1]
 outputlen = 24
 inputlen = datalen-outputlen
@@ -102,12 +102,12 @@ ax.axhline(y=avg_result, color='r', linestyle='-')
 #plt.ylim(0, 1)
 #
 ##======Compare result distribution
-#n_bins=20
-#fig, axs = plt.subplots(1, 2, sharey=True, sharex=False, tight_layout=True)
-## We can set the number of bins with the `bins` kwarg
-#axs[0].hist(y_test, bins=n_bins)
-#axs[0].set_ylabel('Frequency')
-#axs[0].set_title('S-Actual')
-#axs[1].hist(y_pred, bins=n_bins)
-#axs[1].set_xlabel('Probability')
-#axs[1].set_title('S-Predicted')
+n_bins=20
+fig, axs = plt.subplots(1, 2, sharey=True, sharex=False, tight_layout=True)
+# We can set the number of bins with the `bins` kwarg
+axs[0].hist(y_test, bins=n_bins)
+axs[0].set_ylabel('Frequency')
+axs[0].set_title('S-Actual')
+axs[1].hist(y_pred, bins=n_bins)
+axs[1].set_xlabel('Probability')
+axs[1].set_title('S-Predicted')
